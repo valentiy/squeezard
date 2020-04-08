@@ -27,8 +27,6 @@ public:
     static QLineEdit *inputFileAddress;
     static QLineEdit *outputFileAddress;
 
-    static QTextEdit *readTheFile;
-
 private:
     QPointer<FileWork> fileForCompression;
 

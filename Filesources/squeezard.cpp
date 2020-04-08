@@ -2,7 +2,6 @@
 
 QLineEdit *Squeezard::inputFileAddress;
 QLineEdit *Squeezard::outputFileAddress;
-QTextEdit *Squeezard::readTheFile;
 
 Squeezard::Squeezard(QWidget *parent)
     : QWidget(parent)
@@ -16,8 +15,7 @@ Squeezard::Squeezard(QWidget *parent)
     try
     {
         Squeezard::inputFileAddress = new QLineEdit();
-        Squeezard::outputFileAddress = new QLineEdit();
-        Squeezard::readTheFile = new QTextEdit();
+        Squeezard::outputFileAddress = new QLineEdit(); 
 
     }
     catch (std::bad_alloc &exp)
@@ -38,18 +36,15 @@ Squeezard::Squeezard(QWidget *parent)
     //set ui
     ui->verticalLayout->QBoxLayout::addWidget(Squeezard::inputFileAddress);
     ui->verticalLayout->QBoxLayout::addWidget(Squeezard::outputFileAddress);
-    ui->verticalLayout->QBoxLayout::addWidget(Squeezard::readTheFile);
 
     Squeezard::inputFileAddress->QLineEdit::setPlaceholderText("choose file for compression");
     Squeezard::outputFileAddress->QLineEdit::setPlaceholderText("save to: ");
 
-    Squeezard::readTheFile->QWidget::setMaximumHeight(500);
-    Squeezard::readTheFile->QWidget::setMinimumHeight(300);
-
-    Squeezard::readTheFile->QTextEdit::setReadOnly(true);
-
     QObject::connect(Squeezard::inputFileAddress, SIGNAL(returnPressed()), this, SLOT(returnForPressedInputFileAddress()));
     QObject::connect(Squeezard::outputFileAddress, SIGNAL(returnPressed()), this, SLOT(returnForPressedOutputFileAddress()));
+
+    QObject::connect(Squeezard::inputFileAddress, SIGNAL(returnPressed()), Squeezard::inputFileAddress, SLOT(clear()));
+    QObject::connect(Squeezard::outputFileAddress, SIGNAL(returnPressed()), Squeezard::outputFileAddress, SLOT(clear()));
 
     Squeezard::fileForCompression = nullptr;
     try
@@ -91,20 +86,7 @@ void Squeezard::returnForPressedInputFileAddress()
     qDebug() << Squeezard::fileForCompression->inputAddress;
 
     Squeezard::fileForCompression->ReadFile();
-    /*Squeezard::fileForCompression.setFileName(Squeezard::inputAddress);
-    if(Squeezard::fileForCompression.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-    QTextStream fileSText(&fileForCompression);
-    while(!fileSText.atEnd())
-        Squeezard::readTheFile->insertPlainText(fileSText.readLine() + "\n");
-    }
-    else
-    {
-        qDebug() << "File is not open";
-    }
 
-    Squeezard::fileForCompression.close();
-    */
     return;
 }
 
