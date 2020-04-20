@@ -7,12 +7,12 @@ FileWork::FileWork()
     FileWork::workFile = nullptr;
 
     return;
-};
+}
 
 FileWork::~FileWork()
 {
     return;
-};
+}
 
 void FileWork::ReadFile()
 {
@@ -44,8 +44,10 @@ void FileWork::ReadFile()
         qDebug() << "File is not open";
 
     FileWork::workFile->close();
+    delete FileWork::workFile;
+
     return;
-};
+}
 
 void FileWork::SaveNewFile()
 {
@@ -65,6 +67,8 @@ void FileWork::SaveNewFile()
     FileWork::workFile->QFileDevice::close();
 
     FileWork::workFile->close();
+    delete FileWork::workFile;
+
     return;
-};
+}
 
