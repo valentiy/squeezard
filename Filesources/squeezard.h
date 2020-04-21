@@ -4,7 +4,6 @@
 #include <QDebug>
 #include <QWidget>
 #include <QLineEdit>
-#include <QTextEdit>
 #include <QFile>
 #include <QTextStream>
 #include <QString>
@@ -23,6 +22,7 @@ class Squeezard : public QWidget, private Ui::squeezard
 public:
     Squeezard(QWidget *parent = nullptr);
     ~Squeezard();
+
 public:
     static QLineEdit *inputFileAddress;
     static QLineEdit *outputFileAddress;

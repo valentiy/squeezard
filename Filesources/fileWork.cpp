@@ -33,7 +33,7 @@ void FileWork::ReadFile()
         qDebug() << FileWork::fileSText;
     }
 
-    FileWork::workFile->setFileName(FileWork::inputAddress);
+   // FileWork::workFile->setFileName(FileWork::inputAddress);
     if ( FileWork::workFile->open(QIODevice::ReadOnly) )
         {
         qDebug() << "File is openned";
@@ -57,7 +57,7 @@ void FileWork::SaveNewFile()
     //compressedfile's type depends on compression algorithm
     FileWork::workFile = new QFile(FileWork::outputAddress + "/compressedfile.bin");
 
-    FileWork::workFile->setFileName(FileWork::outputAddress);
+  //  FileWork::workFile->setFileName(FileWork::outputAddress);
 
     if ( FileWork::workFile->open(QIODevice::WriteOnly) )
         FileWork::workFile->write(fileSText);

@@ -16,7 +16,6 @@ Squeezard::Squeezard(QWidget *parent)
     {
         Squeezard::inputFileAddress = new QLineEdit();
         Squeezard::outputFileAddress = new QLineEdit(); 
-
     }
     catch (std::bad_alloc &exp)
     {
