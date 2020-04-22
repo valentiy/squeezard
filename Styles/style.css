@@ -6,10 +6,21 @@ QWidget
 
 QLineEdit
 {
-    background-color: #303030;
+    background-color: #404040;
     border: 1px;
     border-color: #ff6200;
     border-style: solid;
     border-radius: 5px;
     padding: 0 8px;
 }
+
+QLineEdit:hover
+{
+    background-color: #303030;
+    border: 1.2px;
+    border-color: #ff6200;
+    border-style: solid;
+    border-radius: 5px;
+    padding: 0 8px;
+}
+

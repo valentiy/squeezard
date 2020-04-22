@@ -36,6 +36,13 @@ Squeezard::Squeezard(QWidget *parent)
     ui->verticalLayout->QBoxLayout::addWidget(Squeezard::inputFileAddress);
     ui->verticalLayout->QBoxLayout::addWidget(Squeezard::outputFileAddress);
 
+    //макс и мин высота
+    Squeezard::inputFileAddress->QWidget::setMaximumHeight(33);
+    Squeezard::outputFileAddress->QWidget::setMaximumHeight(33);
+
+    Squeezard::inputFileAddress->QWidget::setMinimumHeight(33);
+    Squeezard::outputFileAddress->QWidget::setMinimumHeight(33);
+
     Squeezard::inputFileAddress->QLineEdit::setPlaceholderText("choose file for compression");
     Squeezard::outputFileAddress->QLineEdit::setPlaceholderText("save to: ");
 
