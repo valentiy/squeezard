@@ -1,7 +1,7 @@
 #include "Filesources/squeezard.h"
 
-QLineEdit *Squeezard::inputFileAddress;
-QLineEdit *Squeezard::outputFileAddress;
+QLineEdit *Squeezard::inputFileAdress;
+QLineEdit *Squeezard::outputFileAdress;
 
 Squeezard::Squeezard(QWidget *parent)
     : QWidget(parent)
@@ -14,8 +14,11 @@ Squeezard::Squeezard(QWidget *parent)
     //memory allocation & exceptions catch
     try
     {
-        Squeezard::inputFileAddress = new QLineEdit();
-        Squeezard::outputFileAddress = new QLineEdit(); 
+        Squeezard::inputFileAdress = new QLineEdit();
+        Squeezard::inputFileButton = new QPushButton();
+        Squeezard::outputFileAdress = new QLineEdit();
+        Squeezard::outputFileButton = new QPushButton();
+        Squeezard::actionButton = new QPushButton();
     }
     catch (std::bad_alloc &exp)
     {
@@ -33,29 +36,32 @@ Squeezard::Squeezard(QWidget *parent)
     }
 
     //set ui
-    ui->verticalLayout->QBoxLayout::addWidget(Squeezard::inputFileAddress);
-    ui->verticalLayout->QBoxLayout::addWidget(Squeezard::outputFileAddress);
+    ui->horizontalLayoutForINput->QBoxLayout::addWidget(Squeezard::inputFileAdress);
+    ui->horizontalLayoutForINput->QBoxLayout::addWidget(Squeezard::inputFileButton);
+    ui->horizontalLayoutForOutput->QBoxLayout::addWidget(Squeezard::outputFileAdress);
+    ui->horizontalLayoutForOutput->QBoxLayout::addWidget(Squeezard::outputFileButton);
+    ui->horizontalLayoutActionButtons->QBoxLayout::addWidget(Squeezard::actionButton);
 
-    //макс и мин высота
-    Squeezard::inputFileAddress->QWidget::setMaximumHeight(33);
-    Squeezard::outputFileAddress->QWidget::setMaximumHeight(33);
+    Squeezard::inputFileAdress->QLineEdit::setPlaceholderText("choose file for compression");
+    Squeezard::outputFileAdress->QLineEdit::setPlaceholderText("save to: ");
 
-    Squeezard::inputFileAddress->QWidget::setMinimumHeight(33);
-    Squeezard::outputFileAddress->QWidget::setMinimumHeight(33);
+    Squeezard::inputFileButton->QPushButton::setText("browse");
+    Squeezard::outputFileButton->QPushButton::setText("browse");
+    Squeezard::actionButton->QPushButton::setText("compress");
 
-    Squeezard::inputFileAddress->QLineEdit::setPlaceholderText("choose file for compression");
-    Squeezard::outputFileAddress->QLineEdit::setPlaceholderText("save to: ");
+    QObject::connect(Squeezard::inputFileAdress, SIGNAL(returnPressed()), this, SLOT(ReturnForPressedInputFileAdress()));
+    QObject::connect(Squeezard::outputFileAdress, SIGNAL(returnPressed()), this, SLOT(ReturnForPressedOutputFileAdress()));
 
-    QObject::connect(Squeezard::inputFileAddress, SIGNAL(returnPressed()), this, SLOT(returnForPressedInputFileAddress()));
-    QObject::connect(Squeezard::outputFileAddress, SIGNAL(returnPressed()), this, SLOT(returnForPressedOutputFileAddress()));
-
-    QObject::connect(Squeezard::inputFileAddress, SIGNAL(returnPressed()), Squeezard::inputFileAddress, SLOT(clear()));
-    QObject::connect(Squeezard::outputFileAddress, SIGNAL(returnPressed()), Squeezard::outputFileAddress, SLOT(clear()));
+    QObject::connect(Squeezard::inputFileAdress, SIGNAL(returnPressed()), Squeezard::inputFileAdress, SLOT(clear()));
+    QObject::connect(Squeezard::outputFileAdress, SIGNAL(returnPressed()), Squeezard::outputFileAdress, SLOT(clear()));
 
     Squeezard::fileForCompression = nullptr;
+    Squeezard::txtAlgorithm = nullptr;
+
     try
     {
         Squeezard::fileForCompression = new FileWork();
+        Squeezard::txtAlgorithm = new TxtFileCompression();
     }
     catch (std::bad_alloc &exp)
     {
@@ -72,40 +78,53 @@ Squeezard::Squeezard(QWidget *parent)
         abort();
     }
     return;
+
+    QObject::connect(Squeezard::inputFileButton, SIGNAL(clicked(bool)), Squeezard::fileForCompression, SLOT(GetFileAddress()));
+    QObject::connect(Squeezard::outputFileButton, SIGNAL(clicked(bool)), Squeezard::fileForCompression, SLOT(GetFileAddress()));
+    QObject::connect(Squeezard::actionButton, SIGNAL(clicked(bool)), this, SLOT(squeeze()));
+
 }
 
 Squeezard::~Squeezard()
 {
     delete Squeezard::ui;
     delete Squeezard::fileForCompression;
+    delete Squeezard::txtAlgorithm;
 
     return;
 }
 
-void Squeezard::returnForPressedInputFileAddress()
+void Squeezard::ReturnForPressedInputFileAdress()
 {
-    if(Squeezard::inputFileAddress->text() == "")
+    if(Squeezard::inputFileAdress->text() == "")
         return;
 
-    Squeezard::fileForCompression->inputAddress = Squeezard::inputFileAddress->text();
+    Squeezard::fileForCompression->SetInputPath(Squeezard::inputFileAdress->text());
+    Squeezard::txtAlgorithm->Compress(Squeezard::fileForCompression->GetFile());
+   // qDebug() << Squeezard::fileForCompression->inputAddress;
 
-    qDebug() << Squeezard::fileForCompression->inputAddress;
-
-    Squeezard::fileForCompression->ReadFile();
+   // Squeezard::fileForCompression->ReadFile();
 
     return;
 }
 
-void Squeezard::returnForPressedOutputFileAddress()
+void Squeezard::ReturnForPressedOutputFileAdress()
 {
-    if(Squeezard::outputFileAddress->text() == "")
+    if(Squeezard::outputFileAdress->text() == "")
         return;
 
-    Squeezard::fileForCompression->outputAddress = Squeezard::outputFileAddress->text();
+    Squeezard::fileForCompression->SetOutputPath(Squeezard::outputFileAdress->text());
 
-    qDebug() << Squeezard::fileForCompression->outputAddress;
+   // qDebug() << Squeezard::fileForCompression->outputAddress;
 
-    Squeezard::fileForCompression->SaveNewFile();
+   // Squeezard::fileForCompression->SaveNewFile();
 
     return;
+}
+
+void Squeezard::Squeeze()
+{
+    //Squeezard::fileForCompression->ReadFile();
+    //Squeezard::fileForCompression->SaveNewFile();
+    Squeezard::txtAlgorithm->Compress( Squeezard::fileForCompression->GetFile() );
 }

@@ -4,12 +4,14 @@
 #include <QDebug>
 #include <QWidget>
 #include <QLineEdit>
+#include <QPushButton>
 #include <QFile>
 #include <QTextStream>
 #include <QString>
 #include <QPointer>
 #include "ui_squeezard.h"
 #include "Filesources/fileWork.h"
+#include "Compression/txtFileCompression.h"
 
 //QT_BEGIN_NAMESPACE
 //namespace Ui { class squeezard; }
@@ -24,15 +26,20 @@ public:
     ~Squeezard();
 
 public:
-    static QLineEdit *inputFileAddress;
-    static QLineEdit *outputFileAddress;
+    static QLineEdit *inputFileAdress;
+    static QLineEdit *outputFileAdress;
+    QPushButton *inputFileButton;
+    QPushButton *outputFileButton;
+    QPushButton *actionButton;
 
 private:
-    QPointer<FileWork> fileForCompression;
+    FileWork * fileForCompression;
+    TxtFileCompression * txtAlgorithm;
 
 private slots:
-    void returnForPressedInputFileAddress();
-    void returnForPressedOutputFileAddress();
+    void ReturnForPressedInputFileAdress();
+    void ReturnForPressedOutputFileAdress();
+    void Squeeze();
 
 private:
     Ui::squeezard *ui;

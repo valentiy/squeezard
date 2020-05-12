@@ -1,11 +1,11 @@
-#include "Filesources\fileWork.h"
+#include "Filesources/fileWork.h"
+//#include "Compression/txtFileCompression.h"
 
 FileWork::FileWork()
 {
-    FileWork::inputAddress = "";
-    FileWork::outputAddress = "";
+    FileWork::inputAdress = "";
+    FileWork::outputAdress = "";
     FileWork::workFile = nullptr;
-
     return;
 }
 
@@ -14,10 +14,29 @@ FileWork::~FileWork()
     return;
 }
 
+void FileWork::SetInputPath(QString adress)
+{
+    FileWork::inputAdress = adress;
+    qDebug() <<  FileWork::inputAdress;
+
+    return;
+}
+
+void FileWork::SetOutputPath(QString adress)
+{
+    FileWork::outputAdress = adress;
+    return;
+}
+
+QFile * FileWork::GetFile()
+{
+    return workFile;
+}
+
 void FileWork::ReadFile()
 {
-
-    FileWork::workFile = new QFile(FileWork::inputAddress);
+    //TxtFileCompression squeeze;
+    FileWork::workFile = new QFile(FileWork::inputAdress);
     if ( FileWork::workFile->exists() )
         qDebug() << "File exists";
     else
@@ -29,16 +48,19 @@ void FileWork::ReadFile()
     if ( FileWork::workFile->open(QIODevice::ReadOnly) )
     {
         qDebug() << "File is openned";
-        FileWork::fileSText = workFile->readAll();
-        qDebug() << FileWork::fileSText;
+       // squeeze.Compress();
+        char fuck;
+        FileWork::fileSText = workFile->read(1);
+        FileWork::workFile->getChar(&fuck);
+        qDebug() << fuck;
     }
 
    // FileWork::workFile->setFileName(FileWork::inputAddress);
-    if ( FileWork::workFile->open(QIODevice::ReadOnly) )
-        {
-        qDebug() << "File is openned";
-        FileWork::fileSText = workFile->readAll();
-        }
+   // if ( FileWork::workFile->open(QIODevice::ReadOnly) )
+   //     {
+   //     qDebug() << "File is openned";
+   //     FileWork::fileSText = workFile->readAll();
+   //     }
 
     else
         qDebug() << "File is not open";
@@ -55,9 +77,7 @@ void FileWork::SaveNewFile()
     //add possibility to name files
     //not sure for .bin
     //compressedfile's type depends on compression algorithm
-    FileWork::workFile = new QFile(FileWork::outputAddress + "/compressedfile.bin");
-
-  //  FileWork::workFile->setFileName(FileWork::outputAddress);
+    FileWork::workFile = new QFile(FileWork::outputAdress + "/compressedfile.txt");
 
     if ( FileWork::workFile->open(QIODevice::WriteOnly) )
         FileWork::workFile->write(fileSText);
@@ -72,3 +92,7 @@ void FileWork::SaveNewFile()
     return;
 }
 
+void FileWork::GetFileAdress()
+{
+
+}

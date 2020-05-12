@@ -12,6 +12,8 @@ QLineEdit
     border-style: solid;
     border-radius: 5px;
     padding: 0 8px;
+    height: 31px;
+    width: 500px;
 }
 
 QLineEdit:hover
@@ -22,5 +24,30 @@ QLineEdit:hover
     border-style: solid;
     border-radius: 5px;
     padding: 0 8px;
+    height: 31px;
+    width: 500px;
 }
 
+QPushButton
+{
+    background-color: #404040;
+    border: 1px;
+    border-color: #ff6200;
+    border-style: solid;
+    border-radius: 5px;
+    padding: 0 8px;
+    height: 31px;
+    width: 60px;
+    font: italic;
+}
+
+QPushButton:hover
+{
+    background-color: #303030;
+}
+
+QPushButton:pressed
+{
+    background-color: #303030;
+    border: 1px;
+}
