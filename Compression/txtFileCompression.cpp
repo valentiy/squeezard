@@ -15,21 +15,41 @@ void TxtFileCompression::Compress(QFile* file)
     qDebug() << "We entered compression!";
     char nextChar;
 
-    while ( file->atEnd() )
+    if ( file->exists() )
+        qDebug() << "File exists";
+    else
+    {
+        qDebug() << "File does not exist";
+        return;
+    }
+
+    if ( file->open(QIODevice::ReadOnly) )
+        qDebug() << "File is openned";
+    else
+        qDebug() << "File is not open";
+
+    while ( !file->atEnd() )
         {
-            qDebug() << "Getting char";
             file->getChar(&nextChar);
             TxtFileCompression::frequences[(unsigned char)nextChar]++;
+            qDebug() << "Getting char" << (unsigned char)nextChar << TxtFileCompression::frequences[(unsigned char)nextChar];
         }
 
 
     AlgorithmHuf * root = TxtFileCompression::BiuldAlphabet();
+
     std::string code;
 
     qDebug() << "Filling the codebook";
-    root->FillingCodeBook(TxtFileCompression::codebook,code);
+    //works till here
+    root->FillingCodeBook(TxtFileCompression::codebook, code);
 
     TxtFileCompression::Pop(file);
+
+    file->close();
+    delete file;
+
+    return;
 }
 
 void TxtFileCompression::Decompress(QFile* file)
@@ -66,19 +86,21 @@ void TxtFileCompression::Pop(QFile* file)
 
     }
 
+    return;
 }
 
+//works
 AlgorithmHuf* TxtFileCompression::BiuldAlphabet()
 {
     qDebug() << "We entered Building of alphabet!!";
     Alphabet minimum;
     AlgorithmHuf* next;
 
-    for (unsigned int i = 0; i < 256; i++)
+    for (int i = 0; i < 256; i++)
     {
-        qDebug() << "cicle for the building alphabet";
         if (TxtFileCompression::frequences[i])
         {
+            qDebug() << i;
             next = new AlgorithmHuf(i, TxtFileCompression::frequences[i]);
             minimum.Push(next);
 
@@ -98,7 +120,6 @@ AlgorithmHuf* TxtFileCompression::BiuldAlphabet()
         merged = new AlgorithmHuf(first, second);
         minimum.Push(merged);
     }
-
     return minimum.Top();
 }
 /*

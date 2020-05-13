@@ -100,10 +100,9 @@ void Squeezard::ReturnForPressedInputFileAdress()
         return;
 
     Squeezard::fileForCompression->SetInputPath(Squeezard::inputFileAdress->text());
+    //need to understand where close file
+    //Squeezard::fileForCompression->ReadFile();
     Squeezard::txtAlgorithm->Compress(Squeezard::fileForCompression->GetFile());
-   // qDebug() << Squeezard::fileForCompression->inputAddress;
-
-   // Squeezard::fileForCompression->ReadFile();
 
     return;
 }

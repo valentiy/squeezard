@@ -3,7 +3,7 @@
 
 #include "Compression/huffman.h"
 #include <QFile>
-#include <string>
+#include <cstring>
 
 class TxtFileCompression : public QFile
 {

@@ -30,6 +30,7 @@ void FileWork::SetOutputPath(QString adress)
 
 QFile * FileWork::GetFile()
 {
+    FileWork::workFile = new QFile(FileWork::inputAdress);
     return workFile;
 }
 
@@ -37,23 +38,23 @@ void FileWork::ReadFile()
 {
     //TxtFileCompression squeeze;
     FileWork::workFile = new QFile(FileWork::inputAdress);
-    if ( FileWork::workFile->exists() )
-        qDebug() << "File exists";
-    else
-    {
-        qDebug() << "File does not exist";
-        return;
-    }
+   // if ( FileWork::workFile->exists() )
+     //   qDebug() << "File exists";
+   // else
+   // {
+     //   qDebug() << "File does not exist";
+       // return;
+   // }
 
-    if ( FileWork::workFile->open(QIODevice::ReadOnly) )
-    {
-        qDebug() << "File is openned";
+    //if ( FileWork::workFile->open(QIODevice::ReadOnly) )
+    //{
+      //  qDebug() << "File is openned";
        // squeeze.Compress();
-        char fuck;
-        FileWork::fileSText = workFile->read(1);
-        FileWork::workFile->getChar(&fuck);
-        qDebug() << fuck;
-    }
+        //char fuck;
+        //FileWork::fileSText = workFile->read(1);
+        //FileWork::workFile->getChar(&fuck);
+        //qDebug() << fuck;
+    //}
 
    // FileWork::workFile->setFileName(FileWork::inputAddress);
    // if ( FileWork::workFile->open(QIODevice::ReadOnly) )
@@ -62,10 +63,10 @@ void FileWork::ReadFile()
    //     FileWork::fileSText = workFile->readAll();
    //     }
 
-    else
-        qDebug() << "File is not open";
+//    else
+  //      qDebug() << "File is not open";
 
-    FileWork::workFile->close();
+    //FileWork::workFile->close();
     delete FileWork::workFile;
 
     return;

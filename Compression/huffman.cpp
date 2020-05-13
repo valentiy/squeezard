@@ -26,16 +26,20 @@ AlgorithmHuf::~AlgorithmHuf()
 
 }
 
-void AlgorithmHuf::FillingCodeBook(std::string * codebook, std::string & code)
+void AlgorithmHuf::FillingCodeBook(std::string * codebook, std::string &code)
 {
+    qDebug() << "Start filling";
     if (!AlgorithmHuf::leftChar && !AlgorithmHuf::rightChar)
     {
         codebook[AlgorithmHuf::data] = code;
+        qDebug() << "first condition";
+        qDebug() << &codebook[AlgorithmHuf::data];
         return;
     }
 
     if (AlgorithmHuf::leftChar)
     {
+        qDebug() << "second condition";
         code += '0';
         AlgorithmHuf::leftChar->FillingCodeBook(codebook, code);
         code.erase(code.end()-1);
@@ -43,6 +47,7 @@ void AlgorithmHuf::FillingCodeBook(std::string * codebook, std::string & code)
 
     if (AlgorithmHuf::rightChar)
     {
+        qDebug() << "third condition";
         code += '1';
         AlgorithmHuf::rightChar->FillingCodeBook(codebook, code);
         code.erase(code.end()-1);
