@@ -3,14 +3,36 @@
 
 FileWork::FileWork()
 {
-    FileWork::inputAdress = "";
-    FileWork::outputAdress = "";
-    FileWork::workFile = nullptr;
+    try
+    {
+        FileWork::inputAdress = "";
+        FileWork::outputAdress = "";
+        FileWork::workFile = nullptr;
+        FileWork::dialogWindow = new QFileDialog();
+    }
+    catch(std::bad_alloc &exp)
+    {
+        #ifndef Q_DEBUG
+        qCritical() << "Exception caught: " << exp.std::bad_alloc::what();
+        #endif
+        abort();
+    }
+    catch(...)
+    {
+        #ifndef Q_DEBUG
+        qCritical() << "Some exception caught";
+        #endif
+        abort();
+    }
+
+    FileWork::dialogWindow->QFileDialog::setDirectory(QDir::rootPath());
     return;
 }
 
 FileWork::~FileWork()
 {
+    delete FileWork::workFile;
+    delete FileWork::dialogWindow;
     return;
 }
 
@@ -74,10 +96,6 @@ void FileWork::ReadFile()
 
 void FileWork::SaveNewFile()
 {
-
-    //add possibility to name files
-    //not sure for .bin
-    //compressedfile's type depends on compression algorithm
     FileWork::workFile = new QFile(FileWork::outputAdress + "/compressedfile.txt");
 
     if ( FileWork::workFile->open(QIODevice::WriteOnly) )
@@ -93,7 +111,15 @@ void FileWork::SaveNewFile()
     return;
 }
 
-void FileWork::GetFileAdress()
+void FileWork::ChooseFile()
 {
+    FileWork::inputAdress = FileWork::dialogWindow->QFileDialog::getOpenFileName(nullptr, "Choose file", "", "");
 
+    return;
+}
+
+QString FileWork::GetAdress(bool command)
+{
+    if(command)  return FileWork::inputAdress;
+    else   return FileWork::outputAdress;
 }

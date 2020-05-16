@@ -32,7 +32,6 @@ void TxtFileCompression::Compress(QFile* file)
         {
             file->getChar(&nextChar);
             TxtFileCompression::frequences[(unsigned char)nextChar]++;
-            qDebug() << "Getting char" << (unsigned char)nextChar << TxtFileCompression::frequences[(unsigned char)nextChar];
         }
 
 
@@ -100,7 +99,6 @@ AlgorithmHuf* TxtFileCompression::BiuldAlphabet()
     {
         if (TxtFileCompression::frequences[i])
         {
-            qDebug() << i;
             next = new AlgorithmHuf(i, TxtFileCompression::frequences[i]);
             minimum.Push(next);
 

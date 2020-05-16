@@ -3,11 +3,11 @@
 
 #include <QFile>
 #include <QFileDialog>
+#include <QDir>
 #include <QDebug>
 #include <QTextStream>
 #include <QByteArray>
 #include <QString>
-
 
 class FileWork  : public QFile//read about inheritance!!
 {
@@ -26,11 +26,12 @@ public:
     void SetInputPath(QString);
     void SetOutputPath(QString);
     QFile * GetFile();
+    QString GetAdress(bool command);
 
 public slots:
     void ReadFile();
     void SaveNewFile();
-    void GetFileAdress();
+    void ChooseFile();
 };
 
 #endif // FILEWORK_H

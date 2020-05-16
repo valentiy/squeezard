@@ -3,13 +3,14 @@
 
 #include <QDebug>
 #include <QWidget>
+#include <QListWidget>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QFile>
-#include <QTextStream>
 #include <QString>
-#include <QPointer>
+
 #include "ui_squeezard.h"
+
 #include "Filesources/fileWork.h"
 #include "Compression/txtFileCompression.h"
 
@@ -31,6 +32,7 @@ public:
     QPushButton *inputFileButton;
     QPushButton *outputFileButton;
     QPushButton *actionButton;
+    QListWidget *selectedFiles;
 
 private:
     FileWork * fileForCompression;
@@ -39,6 +41,8 @@ private:
 private slots:
     void ReturnForPressedInputFileAdress();
     void ReturnForPressedOutputFileAdress();
+    void CheckingFiles();
+    void DeleteFileFromQueue();
     void Squeeze();
 
 private:

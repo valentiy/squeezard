@@ -4,6 +4,35 @@ QWidget
     color: #ff6200;
 }
 
+QListWidget
+{
+    border: 1px;
+    border-color: #ff6200;
+    border-style: solid;
+    border-radius: 5px;
+    padding: 0 8px;
+}
+
+QListWidget::Item:hover
+{
+    background: #303030;
+    border-radius: 5px;
+}
+
+QListWidget::Item:selected:active
+{
+    background: #303030;
+    color: #000000;
+}
+
+QListWidget::Item:selected:!active
+{
+    background: #303030;
+    border: 1px;
+    border-color: #ff6200;
+    border-radius: 5px;
+}
+
 QLineEdit
 {
     background-color: #404040;
