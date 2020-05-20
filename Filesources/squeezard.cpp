@@ -138,6 +138,6 @@ void Squeezard::DeleteFileFromQueue()
 
 void Squeezard::Squeeze()
 {
-    Squeezard::txtAlgorithm->Compress(Squeezard::fileForCompression->GetFile());
+    Squeezard::txtAlgorithm->Compresss(Squeezard::fileForCompression->GetFile());
     return;
 }

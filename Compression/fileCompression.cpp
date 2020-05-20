@@ -45,6 +45,19 @@ uint8_t* FileCompression::read_file(QFile* file, size_t* out_size)
     return buf;
 };
 
+void FileCompression::SaveFile(uint32_t rans)
+{
+    QFile* file = new QFile("C:/Users/donva/Desktop/compressed.txt");
+    if ( file->open(QIODevice::WriteOnly) )
+         //file->write(rans);
+     file->QFileDevice::close();
+
+     file->close();
+     delete file;
+
+     return;
+}
+
 void FileCompression::count_freqs(uint8_t const* in, size_t nbytes)
 {
     for (int i=0; i < 256; i++)
@@ -281,5 +294,82 @@ void FileCompression::Compress(QFile* file)
          delete[] cum2sym;
 
          return;
+
+}
+
+void FileCompression::Compresss(QFile* file)
+{
+    uint32_t prob_bits = 14;
+    uint32_t prob_scale = 1 << prob_bits;
+
+    uint8_t* in_bytes = read_file(file, &in_size);
+
+    FileCompression::count_freqs(in_bytes, in_size);
+    FileCompression::normalize_freqs(prob_scale);
+
+    uint8_t* cum2sym = new uint8_t[prob_scale];
+
+        for (int s=0; s < 256; s++)
+            for (uint32_t i= FileCompression::cum_freqs[s]; i < FileCompression::cum_freqs[s+1]; i++)
+                cum2sym[i] = s;
+
+        static size_t out_max_size = 32<<20; // 32MB
+        uint8_t* out_buf = new uint8_t[out_max_size];
+        uint8_t* dec_bytes = new uint8_t[in_size];
+
+        // try rANS encode
+        uint8_t *rans_begin;
+        RAns* algorithm = new RAns();
+        RAns::RansEncSymbol esyms[256];
+        RAns::RansDecSymbol dsyms[256];
+
+        for (int i=0; i < 256; i++) {
+            algorithm->RansEncSymbolInit(&esyms[i], FileCompression::cum_freqs[i], FileCompression::freqs[i], prob_bits);
+            algorithm->RansDecSymbolInit(&dsyms[i], FileCompression::cum_freqs[i], FileCompression::freqs[i]);
+        }
+
+        // ---- regular rANS encode/decode. Typical usage.
+
+        memset(dec_bytes, 0xcc, in_size);
+
+        for (int run=0; run < 5; run++) {
+            //double start_time = timer();
+            //uint64_t enc_start_time = __rdtsc();
+
+            RansState rans;
+            algorithm->RansEncInit(&rans);
+            QByteArray write_in ;//= new QByteArray();
+
+            uint8_t* ptr = out_buf + out_max_size; // *end* of output buffer
+            for (size_t i=in_size; i > 0; i--) { // NB: working in reverse!
+                int s = in_bytes[i-1];
+                algorithm->RansEncPutSymbol(&rans, &ptr, &esyms[s]);
+                write_in.append(rans);
+            }
+            //QDataStream* data = new QDataStream(&write_in, QIODevice::WriteOnly);
+            QFile* file_compressed = new QFile("C:/Users/donva/Desktop/compressed.txt");
+            if ( file_compressed->open(QIODevice::WriteOnly) )
+                 file_compressed->write(write_in);
+             else
+             file_compressed->QFileDevice::close();
+
+             file_compressed->close();
+             delete file_compressed;
+
+            algorithm->RansEncFlush(&rans, &ptr);
+            rans_begin = ptr;
+
+           // uint64_t enc_clocks = __rdtsc() - enc_start_time;
+           // double enc_time = timer() - start_time;
+
+        }
+
+        qDebug() << "Compression's complete !";
+        delete[] out_buf;
+        delete[] dec_bytes;
+        delete[] in_bytes;
+        delete[] cum2sym;
+
+        return;
 
 }

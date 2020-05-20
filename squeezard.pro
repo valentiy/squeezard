@@ -17,18 +17,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     Compression/fileCompression.cpp \
-    Compression/huffman.cpp \
     Compression/rAns.cpp \
-    Compression/txtFileCompression.cpp \
     Filesources/fileWork.cpp \
     main.cpp \
     Filesources/squeezard.cpp
 
 HEADERS += \
     Compression/fileCompression.h \
-    Compression/huffman.h \
     Compression/rAns.h \
-    Compression/txtFileCompression.h \
     Filesources/fileWork.h \
     Filesources/squeezard.h
 
