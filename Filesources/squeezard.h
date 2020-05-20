@@ -12,7 +12,7 @@
 #include "ui_squeezard.h"
 
 #include "Filesources/fileWork.h"
-#include "Compression/txtFileCompression.h"
+#include "Compression/fileCompression.h"
 
 //QT_BEGIN_NAMESPACE
 //namespace Ui { class squeezard; }
@@ -36,7 +36,7 @@ public:
 
 private:
     FileWork * fileForCompression;
-    TxtFileCompression * txtAlgorithm;
+    FileCompression * txtAlgorithm;
 
 private slots:
     void ReturnForPressedInputFileAdress();

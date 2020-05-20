@@ -66,7 +66,7 @@ Squeezard::Squeezard(QWidget *parent)
     try
     {
         Squeezard::fileForCompression = new FileWork();
-        Squeezard::txtAlgorithm = new TxtFileCompression();
+        Squeezard::txtAlgorithm = new FileCompression();
     }
     catch (std::bad_alloc &exp)
     {
