@@ -10,7 +10,7 @@ QListWidget
     border-color: #ff6200;
     border-style: solid;
     border-radius: 5px;
-    padding: 0 8px;
+    padding: 1px;
 }
 
 QListWidget::Item:hover

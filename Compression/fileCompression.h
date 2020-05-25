@@ -3,7 +3,7 @@
 
 #include <QFile>
 #include <QDebug>
-#include <QByteArray>
+#include <QMessageBox>
 #include <QDataStream>
 
 #include "Compression/rAns.h"
@@ -26,12 +26,12 @@ public:
     FileCompression();
     ~FileCompression();
     static uint8_t* read_file(QFile* file, size_t* out_size);
-    void SaveFile(uint32_t);
     void count_freqs(uint8_t const* in, size_t nbytes);
     void calc_cum_freqs();
     void normalize_freqs(uint32_t target_total);
     void Compress(QFile*);
     void Compresss(QFile*);
+    void Decompress(QFile*);
 
 private:
 
