@@ -45,6 +45,46 @@ uint8_t* FileCompression::read_file(QFile* file, size_t* out_size)
     return buf;
 };
 
+uint8_t* FileCompression::read(QFile* file, uint32_t* freqs)
+{
+    if ( file->exists() )
+        qDebug() << "File exists";
+    else
+    {
+        qDebug() << "File does not exist";
+       // return;
+    }
+    if ( file->open(QIODevice::ReadOnly) )
+        qDebug() << "File is openned";
+    else
+        qDebug() << "File is not open";
+
+    size_t size = file->size();
+    //file->seek(0);
+
+    uint8_t* buf = new uint8_t[size];
+
+    QDataStream data(file);
+    for(int i = 0; i < 256; i++)
+    {
+        data >> freqs[i];
+        qDebug() << freqs[i];
+    }
+   int iterator = 0;
+    while (!data.atEnd())
+    {
+           data >> buf[iterator];
+           iterator++;
+    }
+
+    //QByteArray buf = file->readAll();
+
+    file->close();
+    qDebug() << "end reading";
+    return buf;
+};
+
+
 
 void FileCompression::count_freqs(uint8_t const* in, size_t nbytes)
 {
@@ -286,6 +326,11 @@ void FileCompression::Compresss(QFile* file)
     FileCompression::count_freqs(in_bytes, in_size);
     FileCompression::normalize_freqs(prob_scale);
 
+    for (int i=0; i < 256; i++)
+    {
+        qDebug() << FileCompression::freqs[i];
+    }
+
     uint8_t* cum2sym = new uint8_t[prob_scale];
 
         for (int s=0; s < 256; s++)
@@ -338,12 +383,21 @@ void FileCompression::Compresss(QFile* file)
         msgBox.setText("Compression's complete !");
         msgBox.exec();
 
-        uint8_t* iterator = out_buf + out_max_size;
-        while(iterator >= rans_begin)
+        qDebug() << "Compression's complete !";
+
+        for (int i=0; i < 256; i++)
+        {
+            qDebug() << FileCompression::freqs[i];
+            put_data << FileCompression::freqs[i];
+        }
+
+        uint8_t* iterator = rans_begin;
+        while(iterator <= out_buf + out_max_size)
         {
             put_data << *iterator;
-            iterator--;
+            iterator++;
         }
+
          file_compressed->QFileDevice::close();
 
          file_compressed->close();
@@ -354,7 +408,7 @@ void FileCompression::Compresss(QFile* file)
 
         qDebug() << "to " << (int)(out_buf + out_max_size - rans_begin) << "bytes";
 
-        QFile* uncompressed = new QFile("C:/Users/donva/Desktop/uncompressed");
+       /* QFile* uncompressed = new QFile("C:/Users/donva/Desktop/uncompressed");
         uncompressed->open(QIODevice::WriteOnly);
         put_data.setDevice(uncompressed);
         // try rANS decode
@@ -384,7 +438,7 @@ void FileCompression::Compresss(QFile* file)
 
         uncompressed->close();
         delete uncompressed;
-
+*/
         delete[] out_buf;
         delete[] dec_bytes;
         delete[] in_bytes;
@@ -396,15 +450,29 @@ void FileCompression::Compresss(QFile* file)
 
 void FileCompression::Decompress(QFile* file)
 {
-    /*uint32_t prob_bits = 14;
+    uint32_t prob_bits = 14;
     uint32_t prob_scale = 1 << prob_bits;
 
-    uint8_t* in_bytes = read_file(file, &in_size);
+    uint8_t* in_bytes = read(file, FileCompression::freqs);
+    for(int i =0; i<256; i++)
+    {
+        qDebug() << FileCompression::freqs[i];
+    }
+
+    FileCompression::normalize_freqs(prob_scale);
+
     uint8_t* cum2sym = new uint8_t[prob_scale];
+    for (int s=0; s < 256; s++)
+        for (uint32_t i= FileCompression::cum_freqs[s]; i < FileCompression::cum_freqs[s+1]; i++)
+            cum2sym[i] = s;
+
     uint8_t* dec_bytes = new uint8_t[in_size];
     RAns::RansDecSymbol dsyms[256];
 
-    QDataStream put_data(file);
+    QFile* new_file =  new QFile("C:/Users/donva/Desktop/decompressed");
+    new_file->open(QIODevice::WriteOnly);
+    QDataStream put_data(new_file);
+
     RAns * algorithm = new RAns();
 
     for (int i=0; i < 256; i++)
@@ -416,7 +484,7 @@ void FileCompression::Decompress(QFile* file)
     {
 
         RansState rans;
-        uint8_t* ptr = rans_begin;
+        uint8_t* ptr = in_bytes;//rans_begin;
         algorithm->RansDecInit(&rans, &ptr);
 
         for (size_t i=0; i < in_size; i++)
@@ -430,19 +498,19 @@ void FileCompression::Decompress(QFile* file)
     }
 
     // check decode results
-    if (memcmp(in_bytes, dec_bytes, in_size) == 0)
+   /* if (memcmp(in_bytes, dec_bytes, in_size) == 0)
         qDebug() << "GOOD DECODE";
     else
-        qDebug() << "ERROR: bad decoder!";
-    file->QFileDevice::close();
+        qDebug() << "ERROR: bad decoder!";*/
+    new_file->QFileDevice::close();
 
-    file->close();
-    delete file;
+    new_file->close();
+    delete new_file;
 
     delete[] dec_bytes;
     delete[] in_bytes;
-    delete[] cum2sym;*/
-
+    delete[] cum2sym;
+    qDebug() << "end decode";
     return;
 
 

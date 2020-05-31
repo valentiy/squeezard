@@ -32,6 +32,7 @@ public:
     QPushButton *inputFileButton;
     QPushButton *outputFileButton;
     QPushButton *actionButton;
+    QPushButton *deActionButton;
     QListWidget *selectedFiles;
 
 private:

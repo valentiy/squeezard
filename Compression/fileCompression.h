@@ -26,6 +26,7 @@ public:
     FileCompression();
     ~FileCompression();
     static uint8_t* read_file(QFile* file, size_t* out_size);
+    static uint8_t* read(QFile* file, uint32_t* freqs);
     void count_freqs(uint8_t const* in, size_t nbytes);
     void calc_cum_freqs();
     void normalize_freqs(uint32_t target_total);

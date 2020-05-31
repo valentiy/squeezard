@@ -19,6 +19,7 @@ Squeezard::Squeezard(QWidget *parent)
     //    Squeezard::outputFileAdress = new QLineEdit();
     //    Squeezard::outputFileButton = new QPushButton();
         Squeezard::actionButton = new QPushButton();
+        Squeezard::deActionButton = new QPushButton();
         Squeezard::selectedFiles = new QListWidget();
     }
     catch (std::bad_alloc &exp)
@@ -43,6 +44,8 @@ Squeezard::Squeezard(QWidget *parent)
    // ui->horizontalLayoutForOutput->QBoxLayout::addWidget(Squeezard::outputFileAdress);
    // ui->horizontalLayoutForOutput->QBoxLayout::addWidget(Squeezard::outputFileButton);
     ui->horizontalLayoutActionButtons->QBoxLayout::addWidget(Squeezard::actionButton);
+    ui->horizontalLayoutActionButtons->QBoxLayout::addWidget(Squeezard::deActionButton);
+
 
     Squeezard::inputFileAdress->QLineEdit::setPlaceholderText("choose file for compression");
    // Squeezard::outputFileAdress->QLineEdit::setPlaceholderText("save to: ");
@@ -50,6 +53,7 @@ Squeezard::Squeezard(QWidget *parent)
     Squeezard::inputFileButton->QPushButton::setText("browse");
   //  Squeezard::outputFileButton->QPushButton::setText("browse");
     Squeezard::actionButton->QPushButton::setText("compress");
+    Squeezard::deActionButton->QPushButton::setText("decompress");
 
     Squeezard::selectedFiles->QAbstractItemView::setSelectionMode(QAbstractItemView::SingleSelection);
     Squeezard::selectedFiles->QAbstractItemView::setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -139,5 +143,7 @@ void Squeezard::DeleteFileFromQueue()
 void Squeezard::Squeeze()
 {
     Squeezard::txtAlgorithm->Compresss(Squeezard::fileForCompression->GetFile());
+    QFile* file_compressed = new QFile("C:/Users/donva/Desktop/compressed");
+    Squeezard::txtAlgorithm->Decompress(file_compressed);
     return;
 }
