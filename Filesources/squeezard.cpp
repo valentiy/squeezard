@@ -41,17 +41,14 @@ Squeezard::Squeezard(QWidget *parent)
     ui->horizontalLayoutForINput->QBoxLayout::addWidget(Squeezard::inputFileAdress);
     ui->horizontalLayoutForINput->QBoxLayout::addWidget(Squeezard::inputFileButton);
     ui->horizontalLayoutForOutput->QBoxLayout::addWidget(Squeezard::selectedFiles);
-   // ui->horizontalLayoutForOutput->QBoxLayout::addWidget(Squeezard::outputFileAdress);
-   // ui->horizontalLayoutForOutput->QBoxLayout::addWidget(Squeezard::outputFileButton);
     ui->horizontalLayoutActionButtons->QBoxLayout::addWidget(Squeezard::actionButton);
     ui->horizontalLayoutActionButtons->QBoxLayout::addWidget(Squeezard::deActionButton);
 
 
     Squeezard::inputFileAdress->QLineEdit::setPlaceholderText("choose file for compression");
-   // Squeezard::outputFileAdress->QLineEdit::setPlaceholderText("save to: ");
 
     Squeezard::inputFileButton->QPushButton::setText("browse");
-  //  Squeezard::outputFileButton->QPushButton::setText("browse");
+
     Squeezard::actionButton->QPushButton::setText("compress");
     Squeezard::deActionButton->QPushButton::setText("decompress");
 
@@ -59,10 +56,7 @@ Squeezard::Squeezard(QWidget *parent)
     Squeezard::selectedFiles->QAbstractItemView::setSelectionBehavior(QAbstractItemView::SelectRows);
 
     QObject::connect(Squeezard::inputFileAdress, SIGNAL(returnPressed()), this, SLOT(ReturnForPressedInputFileAdress()));
-  //  QObject::connect(Squeezard::outputFileAdress, SIGNAL(returnPressed()), this, SLOT(ReturnForPressedOutputFileAdress()));
-
     QObject::connect(Squeezard::inputFileAdress, SIGNAL(returnPressed()), Squeezard::inputFileAdress, SLOT(clear()));
-  //  QObject::connect(Squeezard::outputFileAdress, SIGNAL(returnPressed()), Squeezard::outputFileAdress, SLOT(clear()));
 
     Squeezard::fileForCompression = nullptr;
     Squeezard::txtAlgorithm = nullptr;
@@ -89,9 +83,11 @@ Squeezard::Squeezard(QWidget *parent)
 
     QObject::connect(Squeezard::inputFileButton, SIGNAL(clicked(bool)), Squeezard::fileForCompression, SLOT(ChooseFile()));
     QObject::connect(Squeezard::inputFileButton, SIGNAL(clicked(bool)), this, SLOT(CheckingFiles()));
+
     QObject::connect(Squeezard::selectedFiles, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(DeleteFileFromQueue()));
-   // QObject::connect(Squeezard::outputFileButton, SIGNAL(clicked(bool)), Squeezard::fileForCompression, SLOT(ChooseFile()));
+
     QObject::connect(Squeezard::actionButton, SIGNAL(clicked(bool)), this, SLOT(Squeeze()));
+    QObject::connect(Squeezard::deActionButton, SIGNAL(clicked(bool)), this, SLOT(DeSqueeze()));
 
     return;
 }
@@ -143,7 +139,11 @@ void Squeezard::DeleteFileFromQueue()
 void Squeezard::Squeeze()
 {
     Squeezard::txtAlgorithm->Compresss(Squeezard::fileForCompression->GetFile());
-    QFile* file_compressed = new QFile("C:/Users/donva/Desktop/compressed");
-    Squeezard::txtAlgorithm->Decompress(file_compressed);
+    return;
+}
+
+void Squeezard::DeSqueeze()
+{
+    Squeezard::txtAlgorithm->Decompress(Squeezard::fileForCompression->GetFile());
     return;
 }

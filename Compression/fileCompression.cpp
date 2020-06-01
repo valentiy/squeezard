@@ -45,7 +45,7 @@ uint8_t* FileCompression::read_file(QFile* file, size_t* out_size)
     return buf;
 };
 
-uint8_t* FileCompression::read(QFile* file, uint32_t* freqs)
+uint8_t* FileCompression::read(QFile* file, size_t* in_size, uint32_t* freqs)
 {
     if ( file->exists() )
         qDebug() << "File exists";
@@ -65,11 +65,17 @@ uint8_t* FileCompression::read(QFile* file, uint32_t* freqs)
     uint8_t* buf = new uint8_t[size];
 
     QDataStream data(file);
+
+    //*in_size = 0;
+    data >> *in_size;
+    qDebug() << "size :" << *in_size;
+
     for(int i = 0; i < 256; i++)
     {
         data >> freqs[i];
         qDebug() << freqs[i];
     }
+
    int iterator = 0;
     while (!data.atEnd())
     {
@@ -385,6 +391,9 @@ void FileCompression::Compresss(QFile* file)
 
         qDebug() << "Compression's complete !";
 
+        put_data << in_size;
+        qDebug() << "size :" << in_size;
+
         for (int i=0; i < 256; i++)
         {
             qDebug() << FileCompression::freqs[i];
@@ -453,20 +462,25 @@ void FileCompression::Decompress(QFile* file)
     uint32_t prob_bits = 14;
     uint32_t prob_scale = 1 << prob_bits;
 
-    uint8_t* in_bytes = read(file, FileCompression::freqs);
+    uint8_t* in_bytes = read(file, &in_size, FileCompression::freqs);
     for(int i =0; i<256; i++)
     {
         qDebug() << FileCompression::freqs[i];
     }
 
+    qDebug() << "stop here 462";
     FileCompression::normalize_freqs(prob_scale);
 
+    qDebug() << "stop here 465";
     uint8_t* cum2sym = new uint8_t[prob_scale];
     for (int s=0; s < 256; s++)
         for (uint32_t i= FileCompression::cum_freqs[s]; i < FileCompression::cum_freqs[s+1]; i++)
             cum2sym[i] = s;
 
+    qDebug() << "stop here 471";
     uint8_t* dec_bytes = new uint8_t[in_size];
+
+    qDebug() << "stop here 474";
     RAns::RansDecSymbol dsyms[256];
 
     QFile* new_file =  new QFile("C:/Users/donva/Desktop/decompressed");

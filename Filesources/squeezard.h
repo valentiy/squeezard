@@ -45,6 +45,7 @@ private slots:
     void CheckingFiles();
     void DeleteFileFromQueue();
     void Squeeze();
+    void DeSqueeze();
 
 private:
     Ui::squeezard *ui;
