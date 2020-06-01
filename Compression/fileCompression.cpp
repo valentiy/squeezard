@@ -2,13 +2,20 @@
 
 FileCompression::FileCompression()
 {
-
+    QObject::connect(this, &FileCompression::SetFileType, this, &FileCompression::GetFileType);
+    return;
 };
 
 FileCompression::~FileCompression()
 {
 
 };
+
+void FileCompression::GetFileType(QString type)
+{
+    FileCompression::fileType = type;
+    return;
+}
 
 uint8_t* FileCompression::read_file(QFile* file, size_t* out_size)
 {
@@ -17,7 +24,6 @@ uint8_t* FileCompression::read_file(QFile* file, size_t* out_size)
     else
     {
         qDebug() << "File does not exist";
-       // return;
     }
     if ( file->open(QIODevice::ReadOnly) )
         qDebug() << "File is openned";
@@ -25,7 +31,6 @@ uint8_t* FileCompression::read_file(QFile* file, size_t* out_size)
         qDebug() << "File is not open";
 
     size_t size = file->size();
-    //file->seek(0);
 
     char chars;
     uint8_t* buf = new uint8_t[size];
@@ -34,8 +39,6 @@ uint8_t* FileCompression::read_file(QFile* file, size_t* out_size)
            file->getChar(&chars);
            buf[file->pos()-1] = (unsigned char)chars;
     }
-
-    //QByteArray buf = file->readAll();
 
     file->close();
 
@@ -52,7 +55,6 @@ uint8_t* FileCompression::read(QFile* file, size_t* in_size, uint32_t* freqs)
     else
     {
         qDebug() << "File does not exist";
-       // return;
     }
     if ( file->open(QIODevice::ReadOnly) )
         qDebug() << "File is openned";
@@ -60,13 +62,12 @@ uint8_t* FileCompression::read(QFile* file, size_t* in_size, uint32_t* freqs)
         qDebug() << "File is not open";
 
     size_t size = file->size();
-    //file->seek(0);
 
     uint8_t* buf = new uint8_t[size];
 
     QDataStream data(file);
 
-    //*in_size = 0;
+    data >> FileCompression::fileType;
     data >> *in_size;
     qDebug() << "size :" << *in_size;
 
@@ -164,164 +165,6 @@ void FileCompression::normalize_freqs(uint32_t target_total)
     }
 }
 
-void FileCompression::Compress(QFile* file)
-{
-     uint32_t prob_bits = 14;
-     uint32_t prob_scale = 1 << prob_bits;
-
-     uint8_t* in_bytes = read_file(file, &in_size);
-
-     FileCompression::count_freqs(in_bytes, in_size);
-     FileCompression::normalize_freqs(prob_scale);
-
-     uint8_t* cum2sym = new uint8_t[prob_scale];
-
-         for (int s=0; s < 256; s++)
-             for (uint32_t i= FileCompression::cum_freqs[s]; i < FileCompression::cum_freqs[s+1]; i++)
-                 cum2sym[i] = s;
-
-         static size_t out_max_size = 32<<20; // 32MB
-         uint8_t* out_buf = new uint8_t[out_max_size];
-         uint8_t* dec_bytes = new uint8_t[in_size];
-
-         // try rANS encode
-         uint8_t *rans_begin;
-         RAns* algorithm = new RAns();
-         RAns::RansEncSymbol esyms[256];
-         RAns::RansDecSymbol dsyms[256];
-
-         for (int i=0; i < 256; i++)
-         {
-             algorithm->RansEncSymbolInit(&esyms[i], FileCompression::cum_freqs[i], FileCompression::freqs[i], prob_bits);
-             algorithm->RansDecSymbolInit(&dsyms[i], FileCompression::cum_freqs[i], FileCompression::freqs[i]);
-         }
-
-         // ---- regular rANS encode/decode. Typical usage.
-
-         memset(dec_bytes, 0xcc, in_size);
-
-         for (int run=0; run < 5; run++)
-         {
-
-             RansState rans;
-             algorithm->RansEncInit(&rans);
-
-             uint8_t* ptr = out_buf + out_max_size; // *end* of output buffer
-             for (size_t i=in_size; i > 0; i--)
-             { // NB: working in reverse!
-                 int s = in_bytes[i-1];
-                 algorithm->RansEncPutSymbol(&rans, &ptr, &esyms[s]);
-             }
-             algorithm->RansEncFlush(&rans, &ptr);
-             rans_begin = ptr;
-
-         }
-
-
-         // try rANS decode
-         for (int run=0; run < 5; run++)
-         {
-
-             RansState rans;
-             uint8_t* ptr = rans_begin;
-             algorithm->RansDecInit(&rans, &ptr);
-
-             for (size_t i=0; i < in_size; i++)
-             {
-                 uint32_t s = cum2sym[algorithm->RansDecGet(&rans, prob_bits)];
-                 dec_bytes[i] = (uint8_t) s;
-                 algorithm->RansDecAdvanceSymbol(&rans, &ptr, &dsyms[s], prob_bits);
-             }
-
-         }
-
-         // check decode results
-         if (memcmp(in_bytes, dec_bytes, in_size) == 0)
-             qDebug() << "GOOD DECODE";
-         else
-             qDebug() << "ERROR: bad decoder!";
-
-         // ---- interleaved rANS encode/decode. This is the kind of thing you might do to optimize critical paths.
-
-         memset(dec_bytes, 0xcc, in_size);
-
-         // try interleaved rANS encode
-         for (int run=0; run < 5; run++)
-         {
-
-             RansState rans0, rans1;
-             algorithm->RansEncInit(&rans0);
-             algorithm->RansEncInit(&rans1);
-
-             uint8_t* ptr = out_buf + out_max_size; // *end* of output buffer
-
-             // odd number of bytes?
-             if (in_size & 1)
-             {
-                 int s = in_bytes[in_size - 1];
-                 algorithm->RansEncPutSymbol(&rans0, &ptr, &esyms[s]);
-             }
-
-             for (size_t i=(in_size & ~1); i > 0; i -= 2)
-             { // NB: working in reverse!
-                 int s1 = in_bytes[i-1];
-                 int s0 = in_bytes[i-2];
-                 algorithm->RansEncPutSymbol(&rans1, &ptr, &esyms[s1]);
-                 algorithm->RansEncPutSymbol(&rans0, &ptr, &esyms[s0]);
-             }
-             algorithm->RansEncFlush(&rans1, &ptr);
-             algorithm->RansEncFlush(&rans0, &ptr);
-             rans_begin = ptr;
-
-         }
-
-
-         // try interleaved rANS decode
-         for (int run=0; run < 5; run++)
-         {
-
-             RansState rans0, rans1;
-             uint8_t* ptr = rans_begin;
-             algorithm->RansDecInit(&rans0, &ptr);
-             algorithm->RansDecInit(&rans1, &ptr);
-
-             for (size_t i=0; i < (in_size & ~1); i += 2)
-             {
-                 uint32_t s0 = cum2sym[algorithm->RansDecGet(&rans0, prob_bits)];
-                 uint32_t s1 = cum2sym[algorithm->RansDecGet(&rans1, prob_bits)];
-                 dec_bytes[i+0] = (uint8_t) s0;
-                 dec_bytes[i+1] = (uint8_t) s1;
-                 algorithm->RansDecAdvanceSymbolStep(&rans0, &dsyms[s0], prob_bits);
-                 algorithm->RansDecAdvanceSymbolStep(&rans1, &dsyms[s1], prob_bits);
-                 algorithm->RansDecRenorm(&rans0, &ptr);
-                 algorithm->RansDecRenorm(&rans1, &ptr);
-             }
-
-             // last byte, if number of bytes was odd
-             if (in_size & 1)
-             {
-                 uint32_t s0 = cum2sym[algorithm->RansDecGet(&rans0, prob_bits)];
-                 dec_bytes[in_size - 1] = (uint8_t) s0;
-                 algorithm->RansDecAdvanceSymbol(&rans0, &ptr, &dsyms[s0], prob_bits);
-             }
-
-         }
-
-         // check decode results
-         if (memcmp(in_bytes, dec_bytes, in_size) == 0)
-             qDebug() << "GOOD DECODE";
-         else
-             qDebug() << "ERROR: bad decoder!";
-
-         delete[] out_buf;
-         delete[] dec_bytes;
-         delete[] in_bytes;
-         delete[] cum2sym;
-
-         return;
-
-}
-
 void FileCompression::Compresss(QFile* file)
 {
     uint32_t prob_bits = 14;
@@ -389,7 +232,7 @@ void FileCompression::Compresss(QFile* file)
         msgBox.setText("Compression's complete !");
         msgBox.exec();
 
-        qDebug() << "Compression's complete !";
+        put_data << FileCompression::fileType;
 
         put_data << in_size;
         qDebug() << "size :" << in_size;
@@ -417,37 +260,6 @@ void FileCompression::Compresss(QFile* file)
 
         qDebug() << "to " << (int)(out_buf + out_max_size - rans_begin) << "bytes";
 
-       /* QFile* uncompressed = new QFile("C:/Users/donva/Desktop/uncompressed");
-        uncompressed->open(QIODevice::WriteOnly);
-        put_data.setDevice(uncompressed);
-        // try rANS decode
-        for (int run=0; run < 5; run++)
-        {
-
-            RansState rans;
-            uint8_t* ptr = rans_begin;
-            algorithm->RansDecInit(&rans, &ptr);
-
-            for (size_t i=0; i < in_size; i++)
-            {
-                uint32_t s = cum2sym[algorithm->RansDecGet(&rans, prob_bits)];
-                dec_bytes[i] = (uint8_t) s;
-                algorithm->RansDecAdvanceSymbol(&rans, &ptr, &dsyms[s], prob_bits);
-                if (run == 4) put_data << dec_bytes[i];
-            }
-
-        }
-
-        // check decode results
-        if (memcmp(in_bytes, dec_bytes, in_size) == 0)
-            qDebug() << "GOOD DECODE";
-        else
-            qDebug() << "ERROR: bad decoder!";
-        uncompressed->QFileDevice::close();
-
-        uncompressed->close();
-        delete uncompressed;
-*/
         delete[] out_buf;
         delete[] dec_bytes;
         delete[] in_bytes;
@@ -468,22 +280,19 @@ void FileCompression::Decompress(QFile* file)
         qDebug() << FileCompression::freqs[i];
     }
 
-    qDebug() << "stop here 462";
     FileCompression::normalize_freqs(prob_scale);
 
-    qDebug() << "stop here 465";
     uint8_t* cum2sym = new uint8_t[prob_scale];
     for (int s=0; s < 256; s++)
         for (uint32_t i= FileCompression::cum_freqs[s]; i < FileCompression::cum_freqs[s+1]; i++)
             cum2sym[i] = s;
 
-    qDebug() << "stop here 471";
     uint8_t* dec_bytes = new uint8_t[in_size];
 
-    qDebug() << "stop here 474";
     RAns::RansDecSymbol dsyms[256];
 
-    QFile* new_file =  new QFile("C:/Users/donva/Desktop/decompressed");
+    QFile* new_file =  new QFile("C:/Users/donva/Desktop/decompressed." + fileType);
+
     new_file->open(QIODevice::WriteOnly);
     QDataStream put_data(new_file);
 
@@ -511,11 +320,7 @@ void FileCompression::Decompress(QFile* file)
 
     }
 
-    // check decode results
-   /* if (memcmp(in_bytes, dec_bytes, in_size) == 0)
-        qDebug() << "GOOD DECODE";
-    else
-        qDebug() << "ERROR: bad decoder!";*/
+    qDebug() << "string 327";
     new_file->QFileDevice::close();
 
     new_file->close();

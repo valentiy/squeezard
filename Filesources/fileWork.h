@@ -26,12 +26,14 @@ public:
     void SetInputPath(QString);
     void SetOutputPath(QString);
     QFile * GetFile();
-    QString GetAdress(bool command);
+    QString GetAdress();
+    QString GetType();
 
 public slots:
     void ReadFile();
     void SaveNewFile();
     void ChooseFile();
+
 };
 
 #endif // FILEWORK_H

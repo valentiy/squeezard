@@ -118,8 +118,23 @@ void FileWork::ChooseFile()
     return;
 }
 
-QString FileWork::GetAdress(bool command)
+QString FileWork::GetAdress()
 {
-    if(command)  return FileWork::inputAdress;
-    else   return FileWork::outputAdress;
+    return FileWork::inputAdress;
+}
+
+QString FileWork::GetType()
+{
+    QString::const_iterator iter = inputAdress.end();
+    QString buffer = "";
+
+    do
+    {
+        buffer.push_front(*iter);
+        --iter;
+
+    }while(*iter != ".");
+
+    buffer.chop(1);
+    return buffer;
 }

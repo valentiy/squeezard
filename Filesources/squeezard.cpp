@@ -127,7 +127,7 @@ void Squeezard::ReturnForPressedOutputFileAdress()
 
 void Squeezard::CheckingFiles()
 {
-    Squeezard::selectedFiles->QListWidget::addItem(Squeezard::fileForCompression->GetAdress(true));
+    Squeezard::selectedFiles->QListWidget::addItem(Squeezard::fileForCompression->GetAdress());
     return;
 }
 
@@ -138,6 +138,8 @@ void Squeezard::DeleteFileFromQueue()
 
 void Squeezard::Squeeze()
 {
+    emit Squeezard::txtAlgorithm->SetFileType(Squeezard::fileForCompression->GetType());
+    qDebug() << Squeezard::fileForCompression->GetType();
     Squeezard::txtAlgorithm->Compresss(Squeezard::fileForCompression->GetFile());
     return;
 }
