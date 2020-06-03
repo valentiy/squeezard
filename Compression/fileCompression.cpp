@@ -2,6 +2,10 @@
 
 FileCompression::FileCompression()
 {
+    msgBox.setMinimumSize(500,500);
+    msgBox.setInformativeText("Do you want to save new file?");
+    msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Save);
     QObject::connect(this, &FileCompression::SetFileType, this, &FileCompression::GetFileType);
     return;
 };
@@ -74,7 +78,6 @@ uint8_t* FileCompression::read(QFile* file, size_t* in_size, uint32_t* freqs)
     for(int i = 0; i < 256; i++)
     {
         data >> freqs[i];
-        qDebug() << freqs[i];
     }
 
    int iterator = 0;
@@ -83,8 +86,6 @@ uint8_t* FileCompression::read(QFile* file, size_t* in_size, uint32_t* freqs)
            data >> buf[iterator];
            iterator++;
     }
-
-    //QByteArray buf = file->readAll();
 
     file->close();
     qDebug() << "end reading";
@@ -205,7 +206,7 @@ void FileCompression::Compresss(QFile* file)
         // ---- regular rANS encode/decode. Typical usage.
 
         memset(dec_bytes, 0xcc, in_size);
-        QFile* file_compressed = new QFile("C:/Users/donva/Desktop/compressed");
+        QFile* file_compressed = new QFile("compressed");
         file_compressed->open(QIODevice::WriteOnly);
 
         QDataStream put_data(file_compressed);
@@ -228,10 +229,6 @@ void FileCompression::Compresss(QFile* file)
 
         }
 
-        QMessageBox msgBox;
-        msgBox.setText("Compression's complete !");
-        msgBox.exec();
-
         put_data << FileCompression::fileType;
 
         put_data << in_size;
@@ -250,12 +247,20 @@ void FileCompression::Compresss(QFile* file)
             iterator++;
         }
 
+        int result = (int)(out_buf + out_max_size - rans_begin);
+
+        msgBox.setText("Compression's complete !\n to " + QString::number(result) + " bytes");
+        msgBox.exec();
+        int ret = msgBox.exec();
+
+        switch (ret)
+        {
+            case QMessageBox::Save: emit FileCompression::SaveFlag(file_compressed); break;
+            case QMessageBox::Cancel:  break;
+        }
+
          file_compressed->QFileDevice::close();
-
-         file_compressed->close();
-
-         delete file_compressed;
-
+        delete file_compressed;
         qDebug() << "Compression's complete !";
 
         qDebug() << "to " << (int)(out_buf + out_max_size - rans_begin) << "bytes";
@@ -291,7 +296,7 @@ void FileCompression::Decompress(QFile* file)
 
     RAns::RansDecSymbol dsyms[256];
 
-    QFile* new_file =  new QFile("C:/Users/donva/Desktop/decompressed." + fileType);
+    QFile* new_file =  new QFile("decompressed");
 
     new_file->open(QIODevice::WriteOnly);
     QDataStream put_data(new_file);
@@ -320,7 +325,16 @@ void FileCompression::Decompress(QFile* file)
 
     }
 
-    qDebug() << "string 327";
+    msgBox.setText("Decompression complete!");
+    msgBox.exec();
+    int ret = msgBox.exec();
+
+    switch (ret)
+    {
+        case QMessageBox::Save: emit FileCompression::SendType(fileType); emit FileCompression::SaveFlag(new_file); break;
+        case QMessageBox::Cancel:  break;
+    }
+
     new_file->QFileDevice::close();
 
     new_file->close();

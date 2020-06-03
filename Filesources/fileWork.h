@@ -14,11 +14,11 @@ class FileWork  : public QFile//read about inheritance!!
     Q_OBJECT
 
 private:
-    QByteArray fileSText;
     QFileDialog *dialogWindow;
     QFile *workFile;
     QString inputAdress;
     QString outputAdress;
+    QString type;
 
 public:
     FileWork();
@@ -29,10 +29,12 @@ public:
     QString GetAdress();
     QString GetType();
 
+
 public slots:
-    void ReadFile();
-    void SaveNewFile();
+    void SaveNewFile(QFile*);
     void ChooseFile();
+    void SetType(QString);
+
 
 };
 

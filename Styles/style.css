@@ -80,3 +80,10 @@ QPushButton:pressed
     background-color: #303030;
     border: 1px;
 }
+
+QMessageBox
+{
+    width: 500px;
+    height: 250px;
+}
+

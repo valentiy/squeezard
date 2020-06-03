@@ -89,6 +89,9 @@ Squeezard::Squeezard(QWidget *parent)
     QObject::connect(Squeezard::actionButton, SIGNAL(clicked(bool)), this, SLOT(Squeeze()));
     QObject::connect(Squeezard::deActionButton, SIGNAL(clicked(bool)), this, SLOT(DeSqueeze()));
 
+    QObject::connect(Squeezard::txtAlgorithm, SIGNAL(SendType(QString)), Squeezard::fileForCompression, SLOT(SetType(QString)));
+    QObject::connect(Squeezard::txtAlgorithm, SIGNAL(SaveFlag(QFile*)), Squeezard::fileForCompression, SLOT(SaveNewFile(QFile*)));
+
     return;
 }
 

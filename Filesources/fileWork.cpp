@@ -7,6 +7,7 @@ FileWork::FileWork()
     {
         FileWork::inputAdress = "";
         FileWork::outputAdress = "";
+        FileWork::type = "";
         FileWork::workFile = nullptr;
         FileWork::dialogWindow = new QFileDialog();
     }
@@ -39,8 +40,6 @@ FileWork::~FileWork()
 void FileWork::SetInputPath(QString adress)
 {
     FileWork::inputAdress = adress;
-    qDebug() <<  FileWork::inputAdress;
-
     return;
 }
 
@@ -56,65 +55,19 @@ QFile * FileWork::GetFile()
     return workFile;
 }
 
-void FileWork::ReadFile()
+void FileWork::SaveNewFile(QFile* file)
+
 {
-    //TxtFileCompression squeeze;
-    FileWork::workFile = new QFile(FileWork::inputAdress);
-   // if ( FileWork::workFile->exists() )
-     //   qDebug() << "File exists";
-   // else
-   // {
-     //   qDebug() << "File does not exist";
-       // return;
-   // }
-
-    //if ( FileWork::workFile->open(QIODevice::ReadOnly) )
-    //{
-      //  qDebug() << "File is openned";
-       // squeeze.Compress();
-        //char fuck;
-        //FileWork::fileSText = workFile->read(1);
-        //FileWork::workFile->getChar(&fuck);
-        //qDebug() << fuck;
-    //}
-
-   // FileWork::workFile->setFileName(FileWork::inputAddress);
-   // if ( FileWork::workFile->open(QIODevice::ReadOnly) )
-   //     {
-   //     qDebug() << "File is openned";
-   //     FileWork::fileSText = workFile->readAll();
-   //     }
-
-//    else
-  //      qDebug() << "File is not open";
-
-    //FileWork::workFile->close();
-    delete FileWork::workFile;
-
-    return;
-}
-
-void FileWork::SaveNewFile()
-{
-    FileWork::workFile = new QFile(FileWork::outputAdress + "/compressedfile.txt");
-
-    if ( FileWork::workFile->open(QIODevice::WriteOnly) )
-        FileWork::workFile->write(fileSText);
-    else
-        qDebug() << "File was not saved";
-
-    FileWork::workFile->QFileDevice::close();
-
-    FileWork::workFile->close();
-    delete FileWork::workFile;
-
+    FileWork::dialogWindow->setAcceptMode(QFileDialog::AcceptSave);
+    FileWork::outputAdress = FileWork::dialogWindow->QFileDialog::getSaveFileName(nullptr, "Choose file", "", "");
+    if (type != "") file->rename(FileWork::outputAdress + FileWork::type);
+    else file->rename(FileWork::outputAdress);
     return;
 }
 
 void FileWork::ChooseFile()
 {
     FileWork::inputAdress = FileWork::dialogWindow->QFileDialog::getOpenFileName(nullptr, "Choose file", "", "");
-
     return;
 }
 
@@ -137,4 +90,10 @@ QString FileWork::GetType()
 
     buffer.chop(1);
     return buffer;
+}
+
+void FileWork::SetType(QString data)
+{
+    FileWork::type = "." + data;
+    return;
 }

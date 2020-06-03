@@ -20,6 +20,7 @@ private:
     uint32_t cum_freqs[257];
     size_t in_size;
     QString fileType;
+    QMessageBox msgBox;
 
     static const uint32_t prob_bits;
     static const uint32_t prob_scale;
@@ -43,7 +44,8 @@ private slots:
 
 signals:
     void SetFileType(QString);
-
+    void SaveFlag(QFile*);
+    void SendType(QString);
 
 };
 
